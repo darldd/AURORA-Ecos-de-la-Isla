@@ -1,0 +1,1 @@
+{"name":"aurora-ecos-de-la-isla","version":"0.1.0","private":true,"scripts":{"dev":"vite --host 127.0.0.1"},"dependencies":{"three":"^0.164.1","vite":"^5.4.14"},"type":"module"}
