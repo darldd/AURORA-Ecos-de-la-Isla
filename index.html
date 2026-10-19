@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AURORA: Ecos de la Isla</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="world"></div><div class="shade"></div>
+<header><div class="logo">✦ <span>AURORA<small>ECOS DE LA ISLA</small></span></div><div class="stats">CRISTALES <b id="crystals">0/3</b>　♥ <b id="health">100</b></div><button id="pause">Ⅱ</button></header>
+<aside class="quest"><small>MISIÓN PRINCIPAL</small><h2 id="questTitle">Una luz en la distancia</h2><p id="questDesc">Habla con Lyra junto al campamento.</p><div class="track"><i id="progress"></i></div></aside>
+<div class="location">● COSTA DEL ALBA</div><div id="prompt" class="prompt hidden">E · <span id="promptText">Interactuar</span></div><div id="toast" class="toast hidden"></div><div class="crosshair">+</div>
+<div class="vitals"><small>VITALIDAD <b id="healthText">100 / 100</b></small><div class="healthtrack"><i id="healthbar"></i></div><div class="slots">⚔ <span>Espada</span>　✧ <span>Reliquias</span></div></div>
+<div class="controls">WASD MOVER　 SHIFT CORRER　 ESPACIO SALTAR　 E INTERACTUAR　 CLIC ATACAR</div>
+<nav><button id="inventoryBtn">▤ Inventario <kbd>I</kbd></button><button id="journalBtn">☷ Misiones <kbd>J</kbd></button><button id="saveBtn">↓ Guardar <kbd>K</kbd></button></nav>
+<section id="menu" class="overlay"><div class="menucard"><div class="star">✦</div><small>UNA AVENTURA ORIGINAL</small><h1>AURORA<span>:</span><br><em>Ecos de la Isla</em></h1><p>Una isla olvidada. Tres cristales perdidos. Una luz que espera despertar.</p><button id="play" class="primary">ENTRAR EN LA ISLA ↗</button><button id="continue" class="secondary">CONTINUAR PARTIDA</button><footer>PROTOTIPO JUGABLE · VERSIÓN 0.1</footer></div></section>
+<section id="inventoryPanel" class="panel hidden"><button class="close" data-close="inventoryPanel">×</button><small>EQUIPAMIENTO</small><h2>Inventario</h2><div id="items" class="items"></div><p>Los objetos recogidos se guardan con tu partida.</p></section>
+<section id="journalPanel" class="panel hidden"><button class="close" data-close="journalPanel">×</button><small>TU VIAJE</small><h2>Diario de misiones</h2><div class="entry"><b id="journalTitle">Una luz en la distancia</b><p id="journalDesc">Habla con Lyra junto al campamento.</p><small id="journalStatus">EN CURSO</small></div><div class="entry"><b>Explora la costa</b><p>Busca ruinas, cristales y criaturas en los senderos.</p><small>OPCIONAL</small></div></section>
+<section id="dialogue" class="dialogue hidden"><div class="avatar">✧</div><div><small id="speaker">LYRA · GUARDIANA</small><p id="dialogueText"></p></div><button id="dialogueNext" class="primary">CONTINUAR ↗</button></section>
+<section id="pausePanel" class="pausepanel hidden"><small>PARTIDA EN PAUSA</small><h2>Respira un momento</h2><button id="resume" class="primary">VOLVER AL JUEGO</button><button id="exitMenu" class="secondary">GUARDAR Y SALIR AL MENÚ</button></section>
+<div class="minimap"><div></div><b>•</b><small>ISLA DEL ALBA</small></div><div class="tag">GAMEFORGE AI · PLAYABLE SLICE</div>
+<script type="module" src="js/game.js"></script>
+</body></html>
