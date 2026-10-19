@@ -4,9 +4,9 @@ const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ac8d0);scene.fog=new THREE.Fog(0x9ac8d0,38,115);
 const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,220);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;$('world').appendChild(renderer.domElement);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=true;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;$('world').appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xc8efff,0x47624e,2));
-const sun=new THREE.DirectionalLight(0xffe2b0,3);sun.position.set(-22,35,14);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+const sun=new THREE.DirectionalLight(0xffe2b0,3);sun.position.set(-22,35,14);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-48;sun.shadow.camera.right=48;sun.shadow.camera.top=48;sun.shadow.camera.bottom=-48;sun.shadow.bias=-0.00025;scene.add(sun);
 const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.88,...extra});
 const M={grass:mat(0x568b68),grass2:mat(0x709b71),sand:mat(0xd9c38f),stone:mat(0x7d918f),dark:mat(0x425b62),wood:mat(0x79543b),leaf:mat(0x2e6955),leaf2:mat(0x4b8b64),gold:mat(0xf0cc7b,{metalness:.25,roughness:.32,emissive:0x7d4e13,emissiveIntensity:.4}),crystal:mat(0x8ef5df,{metalness:.15,roughness:.2,emissive:0x35c8ac,emissiveIntensity:1.8}),skin:mat(0xb97959),cloth:mat(0xd3d4b8),enemy:mat(0x493f63,{emissive:0x241a3b,emissiveIntensity:.5})};
 const cylinder=new THREE.CylinderGeometry(1,1,1,8),sphere=new THREE.SphereGeometry(1,12,10),box=new THREE.BoxGeometry(1,1,1);
@@ -14,7 +14,7 @@ function mesh(geo,material,x,y,z,sx=1,sy=1,sz=1,parent=scene){const o=new THREE.
 function group(x=0,y=0,z=0){const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);return g}
 mesh(new THREE.CylinderGeometry(43,47,5,64),M.grass,0,-2.6,0);mesh(new THREE.CylinderGeometry(46,49,2.3,64),M.sand,0,-4.5,0);
 const ocean=mesh(new THREE.CircleGeometry(180,64),mat(0x3c9aa7,{roughness:.24,metalness:.1}),0,-4.95,0);ocean.rotation.x=-Math.PI/2;
-const ground=mesh(new THREE.CircleGeometry(41.7,64),M.grass2,0,-.02,0);ground.rotation.x=-Math.PI/2;
+const terrainGeo=new THREE.CircleGeometry(41.7,96);const terrainPos=terrainGeo.attributes.position;for(let i=0;i<terrainPos.count;i++){const x=terrainPos.getX(i),z=terrainPos.getY(i),r=Math.hypot(x,z);const hills=(Math.sin(x*.21+1.2)*Math.cos(z*.19)+Math.sin(z*.31-x*.12)*.45)*.42;terrainPos.setZ(i,hills*Math.max(0,1-r/43));}terrainGeo.computeVertexNormals();const ground=mesh(terrainGeo,M.grass2,0,-.02,0);ground.rotation.x=-Math.PI/2;
 function path(x,z,sx,sz,rot=0){const p=mesh(new THREE.CircleGeometry(1,24),M.sand,x,.012,z,sx,sz,1);p.rotation.x=-Math.PI/2;p.rotation.z=rot}
 path(-1,1,2.2,20,.02);path(1,-12,14,1.5,-.15);path(12,-13,1.5,10,.25);path(-9,9,9,1.4,-.55);
 for(let i=0;i<9;i++){const a=i/9*Math.PI*2;mesh(new THREE.ConeGeometry(10,20,8),M.dark,Math.cos(a)*42,4,Math.sin(a)*42)}
@@ -25,6 +25,16 @@ function tree(x,z,s=1){const g=group(x,0,z);mesh(cylinder,M.wood,0,1.1*s,0,.34*s
 for(let i=0;i<40;i++){const a=i*2.399,r=17+(i%7)*3,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.hypot(x,z)<35&&Math.hypot(x+2,z-2)>7)tree(x,z,.7+(i%4)*.13)}
 for(let i=0;i<34;i++){const a=i*2.4,r=8+(i%8)*3;mesh(new THREE.DodecahedronGeometry(.45+(i%3)*.16),i%2?M.stone:M.sand,Math.cos(a)*r,.25,Math.sin(a)*r,1,.7,1)}
 for(let i=0;i<55;i++){const a=i*2.17,r=5+(i%10)*2.8,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.hypot(x,z)<38)mesh(sphere,mat(i%2?0xf1d49a:0xb8e3b3),x,.18,z,.09,.12,.09)}
+// Pequeños detalles naturales para que la isla se sienta menos vacía.
+const flowerMats=[mat(0xf6dca0,{emissive:0x49300b,emissiveIntensity:.15}),mat(0xb9e9df,{emissive:0x164c43,emissiveIntensity:.18}),mat(0xd9b8ef,{emissive:0x38204b,emissiveIntensity:.15})];
+for(let i=0;i<150;i++){const a=i*2.399,r=6+(i%13)*2.35,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.hypot(x,z)<38&&Math.hypot(x+2,z-2)>7){const stem=mesh(cylinder,M.leaf2,x,.16,z,.025,.3,.025);stem.rotation.z=.15;mesh(new THREE.SphereGeometry(.09,8,6),flowerMats[i%3],x,.32,z,.8,1,.8);}}
+const glowMotes=[];
+const moteGeo=new THREE.SphereGeometry(.045,8,6),moteMat=new THREE.MeshBasicMaterial({color:0xa9ffe9});
+for(let i=0;i<45;i++){const m=new THREE.Mesh(moteGeo,moteMat);m.position.set((Math.random()-.5)*68,1+Math.random()*7,(Math.random()-.5)*68);scene.add(m);glowMotes.push({mesh:m,baseY:m.position.y,phase:Math.random()*Math.PI*2});}
+const cloudMat=new THREE.MeshStandardMaterial({color:0xe5f4ef,roughness:1,transparent:true,opacity:.62,flatShading:true});
+const clouds=[];
+for(let i=0;i<7;i++){const g=new THREE.Group();g.position.set(-65+i*22,17+(i%3)*2,-35-(i%4)*12);for(let j=0;j<5;j++){const puff=new THREE.Mesh(new THREE.IcosahedronGeometry(1.7+(j%3)*.35,1),cloudMat);puff.position.set((j-2)*1.45,Math.sin(j*2)*.28,Math.cos(j*1.7)*.6);puff.scale.set(1.4,.55,1);g.add(puff);}scene.add(g);clouds.push(g);}
+
 const player=group(0,0,8);mesh(cylinder,mat(0x314b5a),0,.7,0,.42,.9,.42,player);mesh(sphere,M.skin,0,1.45,0,.31,.34,.3,player);mesh(cylinder,M.cloth,0,.94,0,.44,.55,.43,player);mesh(box,M.gold,.22,.95,.02,.1,.52,.12,player);mesh(cylinder,M.wood,-.47,.88,0,.07,.7,.07,player).rotation.z=-.3;
 const pos=player.position,keys={};let yaw=0,health=100,started=false,paused=false,dialogueOpen=false,velocityY=0,onGround=true,toastTime=0,last=performance.now();
 const itemDefs={sunCrystal:{name:'Cristal del alba',icon:'✧'},herb:{name:'Hierba curativa',icon:'❋'},oldCoin:{name:'Moneda antigua',icon:'◉'},sword:{name:'Espada de viaje',icon:'⚔'}};
@@ -66,7 +76,7 @@ function update(dt){if(!started||paused)return;const f=(keys.KeyW||keys.ArrowUp?
 if(!onGround){velocityY-=18*dt;pos.y+=velocityY*dt;if(pos.y<=0){pos.y=0;velocityY=0;onGround=true}}
 const r=Math.hypot(pos.x,pos.z);if(r>38){pos.x*=38/r;pos.z*=38/r}
 if(enemyAlive){const t=performance.now()*.0007;enemy.position.x=enemyStart.x+Math.sin(t)*2;enemy.position.z=enemyStart.z+Math.cos(t*1.2)*2;if(Math.hypot(pos.x-enemy.position.x,pos.z-enemy.position.z)<1.5&&Math.random()<dt*.55){health=Math.max(0,health-8);updateHUD();toast('La sombra te ha herido. ¡Contraataca!');if(health<=0){health=100;pos.set(0,0,8);updateHUD();toast('Te recuperaste en el campamento.')}}}
-pickups.forEach((p,i)=>{if(p.active){p.group.rotation.y+=dt*.5;p.group.position.y=Math.sin(performance.now()*.0018+i)*.12}});
+pickups.forEach((p,i)=>{if(p.active){p.group.rotation.y+=dt*.5;p.group.position.y=Math.sin(performance.now()*.0018+i)*.12}});glowMotes.forEach(m=>{m.mesh.position.y=m.baseY+Math.sin(performance.now()*.001+m.phase)*.55;m.mesh.position.x+=Math.sin(performance.now()*.0002+m.phase)*dt*.18;});clouds.forEach((cloud,i)=>{cloud.position.x+=dt*(.22+(i%3)*.08);if(cloud.position.x>90)cloud.position.x=-90;});
 target=nearby();if(target&&!dialogueOpen){$('prompt').classList.remove('hidden');$('promptText').textContent=target.kind==='npc'?'Hablar con Lyra':target.type==='sunCrystal'?'Recoger cristal':'Atacar sombra'}else $('prompt').classList.add('hidden');
 if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.add('hidden')}
 }
